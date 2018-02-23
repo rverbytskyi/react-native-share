@@ -32,6 +32,9 @@ local.properties
 # Visual Studio
 *.VC.db
 
+# Idea
+.idea/
+
 # node.js
 #
 node_modules/

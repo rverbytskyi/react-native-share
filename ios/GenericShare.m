@@ -12,10 +12,20 @@
 - (void)shareSingle:(NSDictionary *)options
     failureCallback:(RCTResponseErrorBlock)failureCallback
     successCallback:(RCTResponseSenderBlock)successCallback
-    serviceType:(NSString*)serviceType {
+        serviceType:(NSString*)serviceType {
+
+    static BOOL canOpenViaApp;
+
+    canOpenViaApp = [SLComposeViewController isAvailableForServiceType:serviceType];
+
+    if ([options[@"social"] isEqualToString:@"facebook"]){
+        canOpenViaApp = [self isAppInstalled:@"fbauth2"];
+    } else if ([options[@"social"] isEqualToString:@"twitter"]){
+        canOpenViaApp = [self isAppInstalled:@"twitterauth"];
+    }
 
     NSLog(@"Try open view");
-    if([SLComposeViewController isAvailableForServiceType:serviceType]) {
+    if(canOpenViaApp) {
 
         SLComposeViewController *composeController = [SLComposeViewController  composeViewControllerForServiceType:serviceType];
 
@@ -63,21 +73,30 @@
         }
 
         if ([options[@"social"] isEqualToString:@"facebook"]) {
-          NSString *URL = [NSString stringWithFormat:@"https://www.facebook.com/sharer/sharer.php?u=%@", options[@"url"]];
-          [self openScheme:URL];
+            NSString *URL = [NSString stringWithFormat:@"https://www.facebook.com/sharer/sharer.php?u=%@", options[@"url"]];
+            [self openScheme:URL];
         }
 
-      }
-  }
-  - (void)openScheme:(NSString *)scheme {
-      UIApplication *application = [UIApplication sharedApplication];
-      NSURL *schemeURL = [NSURL URLWithString:scheme];
+    }
+}
 
-      if ([application respondsToSelector:@selector(openURL:options:completionHandler:)]) {
-          [application openURL:schemeURL options:@{} completionHandler:nil];
-          NSLog(@"Open %@: %d", schemeURL);
-      }
+-(BOOL)isAppInstalled:(NSString *)scheme {
+    NSURLComponents *components = [[NSURLComponents alloc] init];
+    components.scheme = scheme;
+    components.path = @"/";
+    return [[UIApplication sharedApplication]
+            canOpenURL:components.URL];
+}
 
-  }
+- (void)openScheme:(NSString *)scheme {
+    UIApplication *application = [UIApplication sharedApplication];
+    NSURL *schemeURL = [NSURL URLWithString:scheme];
+
+    if ([application respondsToSelector:@selector(openURL:options:completionHandler:)]) {
+        [application openURL:schemeURL options:@{} completionHandler:nil];
+        NSLog(@"Open %@: %d", schemeURL);
+    }
+
+}
 
   @end
