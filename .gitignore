@@ -25,6 +25,9 @@ project.xcworkspace
 # Visual Studio
 *.VC.db
 
+# Idea
+.idea/
+
 # node.js
 #
 node_modules/
