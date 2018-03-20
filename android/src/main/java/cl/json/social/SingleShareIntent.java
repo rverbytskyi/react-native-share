@@ -41,18 +41,7 @@ public abstract class SingleShareIntent extends ShareIntent {
                 super.open(options);
             } else {
                 System.out.println("NOT INSTALLED");
-                String url = "";
-                if(getDefaultWebLink() != null) {
-                    url = getDefaultWebLink()
-                            .replace("{url}",       this.urlEncode( options.getString("url") ) )
-                            .replace("{message}",   this.urlEncode( options.getString("message") ));
-                } else if(getPlayStoreLink() != null) {
-                    url = getPlayStoreLink();
-                } else{
-                    //  TODO
-                }
-                //  open web intent
-                this.setIntent(new Intent(new Intent("android.intent.action.VIEW", Uri.parse(url))));
+                throw new ActivityNotFoundException("App is not installed");
             }
         } else {
             //  configure default
